@@ -39,5 +39,5 @@ module FirstVGA(VS, HS, RED, GREEN, BLUE, SWITCH, CLK_100MHz, Reset);
 						.firstX(11'd0),
 						.firstY(11'd0),
 						.clk(CLK_100MHz),
-						.reset(Reset));)
+						.reset(Reset));
 endmodule
