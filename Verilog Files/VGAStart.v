@@ -8,8 +8,9 @@ module FirstVGA(VS, HS, RED, GREEN, BLUE, SWITCH, CLK_100MHz, Reset);
     input  [4:0]    SWITCH;
     input           CLK_100MHz, Reset;
     
-    wire            HBlank, VBlank;
+    wire            HBlank, VBlank,yeswire;
     wire   [10:0]   CurrentX, CurrentY;
+	wire   [3:0]    widgred,widggreen,widgblue;
 
     // Connect to driver of VGA signals
     VGALLDriver vgadll(.VS(VS),.HS(HS),.VBlank(VBlank),.HBlank(HBlank),
@@ -19,5 +20,24 @@ module FirstVGA(VS, HS, RED, GREEN, BLUE, SWITCH, CLK_100MHz, Reset);
     // Connect to "client" which produces pixel color based on (X,Y) location
     VGAClient   vgacl(.RED(RED),.GREEN(GREEN),.BLUE(BLUE),
                       .CurrentX(CurrentX),.CurrentY(CurrentY),.VBlank(VBlank),.HBlank(HBlank),
-                      .SWITCH(SWITCH),.CLK_100MHz(CLK_100MHz));
+                      .SWITCH(SWITCH),.wRed(widgred),.wGreen(widggreen),.wBlue(widgblue),.yes(yeswire),.CLK_100MHz(CLK_100MHz));
+					  
+	// Create an instance of widget
+	widget		vgawidg(.yes(yeswire),
+						.red(widgred),
+						.green(widggreen),
+						.blue(widgblue),
+						.X(CurrentX),
+						.Y(CurrentY),
+						.xSize(9'd4),
+						.ySize(9'd4),
+						.delX(5'd6),
+						.delY(5'd4),
+						.redIn(4'd15),
+						.greenIn(4'd15),
+						.blueIn(4'd0),
+						.firstX(11'd0),
+						.firstY(11'd0),
+						.clk(CLK_100MHz),
+						.reset(Reset));)
 endmodule

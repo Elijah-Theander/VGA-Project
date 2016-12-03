@@ -11,7 +11,7 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 	output       yes;
 	output [3:0] red,green,blue;
 	
-	input  [9:0] X,Y,firstX,firstY;
+	input  [10:0] X,Y,firstX,firstY;
 	input  [8:0] xSize,ySize;
 	input  [4:0] delX,delY;
 	input  [3:0] redIn,greenIn,blueIn;
@@ -23,7 +23,7 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 	//With this signed interpretation, we can have a positive value
 	//of 0-15 for our positive del values.
 	reg signed [4:0]  myDelX,myDelY,nextDelX,nextDelY;
-	reg        [9:0]  myX,myY,nextX,nextY;
+	reg        [10:0]  myX,myY,nextX,nextY;
 	
 	parameter rightBorder = 799, bottomBorder = 599;
 	
