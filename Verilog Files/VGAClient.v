@@ -40,7 +40,8 @@ module VGAClient(RED,GREEN,BLUE,CurrentX,CurrentY,VBlank,HBlank,SWITCH,CLK_100MH
             endcase
         else begin
             UglyTemp=CurrentX*CurrentY;
-            {RED,GREEN,BLUE}=UglyTemp[11:0];    
+            {RED,GREEN,BLUE}={UglyTemp[20],UglyTemp[18],UglyTemp[16],UglyTemp[14],UglyTemp[12],UglyTemp[10],
+			                  UglyTemp[8],UglyTemp[6],UglyTemp[4],UglyTemp[2],UglyTemp[0],UglyTemp[19]};    
         end
     end
  endmodule
