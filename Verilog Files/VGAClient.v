@@ -3,11 +3,13 @@
 // Jerry C. Hamann
 // Computes the desired color at pix (X,Y), must do this fast!
 
-module VGAClient(RED,GREEN,BLUE,CurrentX,CurrentY,VBlank,HBlank,SWITCH,CLK_100MHz);
+module VGAClient(RED,GREEN,BLUE,CurrentX,CurrentY,VBlank,HBlank,SWITCH,wRed,wGreen,wBlue,yes,CLK_100MHz);
     output  [3:0]   RED, GREEN, BLUE;
     input   [10:0]  CurrentX, CurrentY;
     input           VBlank, HBlank;
-    input   [3:0]   SWITCH;
+    input   [4:0]   SWITCH;
+	input   [3:0]   wRed,wGreen,wBlue;
+	input           yes;
     input           CLK_100MHz;
 
     reg     [2:0]   ColorSel;
@@ -26,7 +28,7 @@ module VGAClient(RED,GREEN,BLUE,CurrentX,CurrentY,VBlank,HBlank,SWITCH,CLK_100MH
     always @(VBlank,HBlank,ColorSel,CurrentX,CurrentY,SWITCH[3]) begin
         if(VBlank || HBlank)
             {RED,GREEN,BLUE}=0; // Must drive colors only during non-blanking times.
-        else if(!SWITCH[3])
+        else if((!SWITCH[3])&&(!SWITCH[4]))
             case(ColorSel)
                 3'b000: {RED,GREEN,BLUE} = (CurrentX<100 || CurrentX>700 || CurrentY<100 || CurrentY>500) ? 12'hfff : 12'h000;
                 3'b001: {RED,GREEN,BLUE} = (CurrentX<100 || CurrentX>700 || CurrentY<100 || CurrentY>500) ? 12'hfff : 12'h00f;
@@ -38,10 +40,13 @@ module VGAClient(RED,GREEN,BLUE,CurrentX,CurrentY,VBlank,HBlank,SWITCH,CLK_100MH
                 3'b111: {RED,GREEN,BLUE} = (CurrentX<100 || CurrentX>700 || CurrentY<100 || CurrentY>500) ? 12'hfff : 12'h777;
                 default:  {RED,GREEN,BLUE} = (CurrentX<100 || CurrentX>700 || CurrentY<100 || CurrentY>500) ? 12'hfff : 12'h000;
             endcase
-        else begin
+        else if(!SWITCH[4]) begin
             UglyTemp=CurrentX*CurrentY;
             {RED,GREEN,BLUE}={UglyTemp[20],UglyTemp[18],UglyTemp[16],UglyTemp[14],UglyTemp[12],UglyTemp[10],
 			                  UglyTemp[8],UglyTemp[6],UglyTemp[4],UglyTemp[2],UglyTemp[0],UglyTemp[19]};    
         end
+		else begin
+			{RED,GREEN,BLUE} = yes ? {wRed,wGreen,wBlue} : 12'hfff;
+		end
     end
  endmodule

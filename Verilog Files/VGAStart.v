@@ -5,7 +5,7 @@
 module FirstVGA(VS, HS, RED, GREEN, BLUE, SWITCH, CLK_100MHz, Reset);
     output          VS, HS; 
     output [3:0]    RED, GREEN, BLUE;
-    input  [3:0]    SWITCH;
+    input  [4:0]    SWITCH;
     input           CLK_100MHz, Reset;
     
     wire            HBlank, VBlank;

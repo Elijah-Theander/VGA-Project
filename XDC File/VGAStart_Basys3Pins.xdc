@@ -24,6 +24,9 @@ set_property PACKAGE_PIN W16 [get_ports {SWITCH[2]}]
 #SW3
 set_property PACKAGE_PIN W17 [get_ports {SWITCH[3]}]					
 	set_property IOSTANDARD LVCMOS33 [get_ports {SWITCH[3]}]
+#SW4
+set_property PACKAGE_PIN W15 [get_ports {SWITCH[4]}]
+	set_property IOSTANDARD LVCMOS33 [get_ports {SWITCH[4]}]
 #SW15
 set_property PACKAGE_PIN R2 [get_ports {Reset}]					
 	set_property IOSTANDARD LVCMOS33 [get_ports {Reset}]
