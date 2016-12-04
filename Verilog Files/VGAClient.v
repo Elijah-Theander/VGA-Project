@@ -25,7 +25,7 @@ module VGAClient(RED,GREEN,BLUE,CurrentX,CurrentY,VBlank,HBlank,SWITCH,wRed,wGre
     end
    
     // Assuming an 800x600 screen resolution, paints a 100 pixel white border.
-    always @(VBlank,HBlank,ColorSel,CurrentX,CurrentY,SWITCH[3]) begin
+    always @(VBlank,HBlank,ColorSel,CurrentX,CurrentY,SWITCH[3],SWITCH[4],yes,wRed,wGreen,wBlue) begin
         if(VBlank || HBlank)
             {RED,GREEN,BLUE}=0; // Must drive colors only during non-blanking times.
         else if((!SWITCH[3])&&(!SWITCH[4]))

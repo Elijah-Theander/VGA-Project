@@ -49,9 +49,8 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 	end
 	
 	//nextDelX and nextDelY
-	always @(myX,myY,myDelX,myDelY)begin
+	always @(myX,myDelX,xSize,negDelX,delX)begin
 	
-		//DelX
 		if((myX + xSize + myDelX) == rightBorder)begin
 			nextDelX = negDelX;
 		end
@@ -62,17 +61,19 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 			nextDelX = myDelX;
 		end
 		
-		//DelY
-		if((myY + ySize + myDelY) == bottomBorder)begin
-			nextDelY = negDelY;
-		end
-		else if((myY + myDelY) == 0)begin
-			nextDelY = delY;
-		end
-		else begin
-			nextDelY = myDelY;
-		end
-		
+	end
+	always @(myY,myDelY,ySize,negDelY,delY)begin
+	   
+            if((myY + ySize + myDelY) == bottomBorder)begin
+                nextDelY = negDelY;
+            end
+            else if((myY + myDelY) == 0)begin
+                nextDelY = delY;
+            end
+            else begin
+                nextDelY = myDelY;
+            end
+            
 	end
 	
 	assign {red,green,blue} = {redIn,greenIn,blueIn};
