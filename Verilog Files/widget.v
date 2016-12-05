@@ -6,24 +6,20 @@ State machine module designed to run a sprite
 on a VGA screen at 800x600.
 */
 
-module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,firstX,firstY,clk,reset);
+module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,enable,firstX,firstY,clk,reset);
 
-	output       yes;
-	output [3:0] red,green,blue;
+	output              yes;
+	output       [3:0]  red,green,blue;
 	
-	input  [10:0] X,Y,firstX,firstY;
-	input  [8:0] xSize,ySize;
-	input  [4:0] delX,delY;
-	input  [3:0] redIn,greenIn,blueIn;
-	input        clk,reset;
+	input        [10:0] X,Y,firstX,firstY;
+	input        [8:0]  xSize,ySize;
+	input signed [4:0]  delX,delY;
+	input        [3:0]  redIn,greenIn,blueIn;
+	input               enable;
+	input               clk,reset;
 	
-	wire signed [4:0] negDelX,negDelY;
-	assign negDelX = -delX;
-	assign negDelY = -delY;
-	//With this signed interpretation, we can have a positive value
-	//of 0-15 for our positive del values.
-	reg signed [4:0]  myDelX,myDelY,nextDelX,nextDelY;
-	reg        [10:0]  myX,myY,nextX,nextY;
+	reg signed    [10:0]  myX,myY,nextX,nextY;
+	reg subtractX,subtractY,nextSubX,nextSubY;
 	
 	parameter rightBorder = 799, bottomBorder = 599;
 	
@@ -31,50 +27,106 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 		if(reset)begin
 			myX <= firstX;
 			myY <= firstY;
-			myDelX <= delX;
-			myDelY <= delY;
+			subtractX = 0;
+			subtractY = 0;
 		end
 		else begin
 			myX <= nextX;
 			myY <= nextY;
-			myDelX <= nextDelX;
-			myDelY <= nextDelY;
+			subtractX = nextSubX;
+			subtractY = nextSubY;
 		end
 	end
 	
 	//nextX and nextY
-	always @(myX,myY,myDelX,myDelY)begin
-		nextX = (myX + myDelX);
-		nextY = (myY + myDelY);
+	always @(myX,delX,xSize,subtractX,enable)begin
+	   if(enable)begin
+	   
+	       if(subtractX)begin
+	       
+	           if((myX - delX)<=0)begin
+	               nextX=0;
+	           end
+	           else begin
+                   nextX = (myX - delX);
+               end
+               
+	       end
+	       else begin
+	           if(((myX + delX +xSize)>=rightBorder)&&((myX + delX + xSize)<=1023))begin
+	               nextX = (rightBorder - xSize);
+	           end 
+	           else begin
+	               nextX = (myX + delX);
+	           end
+	       end
+	   end
+	   else begin
+	       nextX = myX;
+	   end
+	   
 	end
 	
-	//nextDelX and nextDelY
-	always @(myX,myDelX,xSize,negDelX,delX)begin
+	always @(myY,delY,ySize,subtractY,enable)begin
+	   if(enable)begin
+	       if(subtractY)begin
+	           if((myY - delY)<=0)begin
+	               nextY = 0;
+	           end
+	           else begin
+	               nextY = (myY - delY);
+	           end
+	       end
+	       else begin
+	           if(((myY + delY + ySize)>=bottomBorder)&&((myY + delY + ySize)<=1023))begin
+	               nextY = (bottomBorder - ySize);
+	           end
+	           else begin
+	               nextY = (myY + delY);
+	           end
+	       end
+	   end
+	   else begin
+	       nextY = myY;
+	   end
+	end
 	
-		if((myX + xSize + myDelX) == rightBorder)begin
-			nextDelX = negDelX;
-		end
-		else if((myX + myDelX) == 0)begin
-			nextDelX = delX;
+	//subtractX & subtractY
+	always @(myX,xSize,delX,subtractX,enable)begin
+	
+		if(enable)begin
+			if((!subtractX)&&((myX + xSize + delX) >= rightBorder))begin
+				nextSubX = 1;
+			end
+			else if(subtractX &&((myX - delX)<=0))begin
+				nextSubX = 0;
+			end
+			else begin
+				nextSubX = subtractX;
+			end
 		end
 		else begin
-			nextDelX = myDelX;
+			nextSubX = subtractX;
 		end
 		
 	end
-	always @(myY,myDelY,ySize,negDelY,delY)begin
-	   
-            if((myY + ySize + myDelY) == bottomBorder)begin
-                nextDelY = negDelY;
+
+    always @(myY,ySize,delY,subtractY,enable)begin
+        if(enable)begin
+            if((!subtractY)&&((myY + ySize + delY)>= bottomBorder))begin
+                nextSubY=1;
             end
-            else if((myY + myDelY) == 0)begin
-                nextDelY = delY;
+            else if(subtractY && ((myY - delY)<=0))begin
+                nextSubY = 0;
             end
             else begin
-                nextDelY = myDelY;
+                nextSubY = subtractY;
             end
-            
-	end
+        end
+        else begin
+            nextSubY = subtractY;
+        end
+    end
 	
 	assign {red,green,blue} = {redIn,greenIn,blueIn};
 	
