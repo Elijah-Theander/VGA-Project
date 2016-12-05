@@ -46,7 +46,7 @@ module VGAClient(RED,GREEN,BLUE,CurrentX,CurrentY,VBlank,HBlank,SWITCH,wRed,wGre
 			                  UglyTemp[8],UglyTemp[6],UglyTemp[4],UglyTemp[2],UglyTemp[0],UglyTemp[19]};    
         end
 		else begin
-			{RED,GREEN,BLUE} = yes ? {wRed,wGreen,wBlue} : 12'hfff;
+			{RED,GREEN,BLUE} = yes ? {wRed,wGreen,wBlue} : 12'h777;
 		end
     end
  endmodule
