@@ -8,7 +8,7 @@ module FirstVGA(VS, HS, RED, GREEN, BLUE, SWITCH, CLK_100MHz, Reset);
     input  [4:0]    SWITCH;
     input           CLK_100MHz, Reset;
     
-    wire            HBlank, VBlank,yeswire;
+    wire            HBlank, VBlank,yeswire,tenhzwire;
     wire   [10:0]   CurrentX, CurrentY;
 	wire   [3:0]    widgred,widggreen,widgblue;
 
@@ -29,15 +29,23 @@ module FirstVGA(VS, HS, RED, GREEN, BLUE, SWITCH, CLK_100MHz, Reset);
 						.blue(widgblue),
 						.X(CurrentX),
 						.Y(CurrentY),
-						.xSize(9'd4),
-						.ySize(9'd4),
+						.xSize(9'd20),
+						.ySize(9'd20),
 						.delX(5'd6),
 						.delY(5'd4),
-						.redIn(4'd15),
-						.greenIn(4'd15),
+						.redIn(4'd0),
+						.greenIn(4'd0),
 						.blueIn(4'd0),
+						.enable(tenhzwire),
 						.firstX(11'd0),
 						.firstY(11'd0),
 						.clk(CLK_100MHz),
 						.reset(Reset));
+						
+	
+	// Clock divider
+	tenHzDiv    tenhertz(.tenHz(tenhzwire),
+						 .enable(1'b1),
+						 .clk(CLK_100MHz),
+						 .reset(Reset));
 endmodule
