@@ -116,21 +116,8 @@ module buttonWidget(yes,myX,nextY,sizeY,red,green,blue,X,Y,xSize,ySize,delX,delY
 		
 	end
 
-    always @(myY,ySize,delY,subtractY,enable)begin
-        if(enable)begin
-            if((!subtractY)&&((myY + ySize + delY)>= bottomBorder))begin
-                nextSubY=1;
-            end
-            else if(subtractY && ((myY - delY)<=0))begin
-                nextSubY = 0;
-            end
-            else begin
-                nextSubY = subtractY;
-            end
-        end
-        else begin
-            nextSubY = subtractY;
-        end
+    always @(up,down)begin
+        nextSubY = up? 1:(down? 0: subtractY);
     end
 	
 	assign {red,green,blue} = {redIn,greenIn,blueIn};
