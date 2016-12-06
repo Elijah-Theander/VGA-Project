@@ -34,7 +34,7 @@ module clockDiv(divPulse,enable,clk,reset);
 		end
 	end
 	
-	assign tenHz = (S == 22'd3_333_334);
+	assign divPulse = (S == 22'd3_333_334);
 	
 endmodule
 
