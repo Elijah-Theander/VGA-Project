@@ -3,13 +3,13 @@
 // Jerry C. Hamann
 // Computes the desired color at pix (X,Y), must do this fast!
 
-module VGAClient(RED,GREEN,BLUE,CurrentX,CurrentY,VBlank,HBlank,SWITCH,wRed,wGreen,wBlue,yes,CLK_100MHz);
+module VGAClient(RED,GREEN,BLUE,CurrentX,CurrentY,VBlank,HBlank,SWITCH,redOne,redTwo,greenOne,greenTwo,blueOne,blueTwo,yesOne,yesTwo,CLK_100MHz);
     output  [3:0]   RED, GREEN, BLUE;
     input   [10:0]  CurrentX, CurrentY;
     input           VBlank, HBlank;
     input   [4:0]   SWITCH;
-	input   [3:0]   wRed,wGreen,wBlue;
-	input           yes;
+	input   [3:0]   redOne,redTwo,greenOne,greenTwo,blueOne,blueTwo;
+	input           yesOne,yesTwo;
     input           CLK_100MHz;
 
     reg     [2:0]   ColorSel;
@@ -46,7 +46,7 @@ module VGAClient(RED,GREEN,BLUE,CurrentX,CurrentY,VBlank,HBlank,SWITCH,wRed,wGre
 			                  UglyTemp[8],UglyTemp[6],UglyTemp[4],UglyTemp[2],UglyTemp[0],UglyTemp[19]};    
         end
 		else begin
-			{RED,GREEN,BLUE} = yes ? {wRed,wGreen,wBlue} : 12'h777;
+			{RED,GREEN,BLUE} = yesOne ? {redOne,greenOne,blueOne} : (yesTwo ? {redTwo,greenTwo,blueTwo}:12'h777);
 		end
     end
  endmodule
