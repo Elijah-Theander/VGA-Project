@@ -97,7 +97,7 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 	end
 	
 	//subtractX & subtractY
-	always @(myX,xSize,delX,subtractX,enable)begin
+	always @(myX,xSize,delX,subtractX,enable,theirX,myY,delY,theirNextY,theirSizeY,ySize)begin
 	
 		if(enable)begin
 			if(((!subtractX)&&((myX + xSize + delX) >= rightBorder))||((((myX+delX+xSize)>=theirX)&&(((myY+delY) <= (theirNextY +theirSizeY))&&((myY+delY+ySize)>=theirNextY)))))begin
