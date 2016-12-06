@@ -116,7 +116,7 @@ module buttonWidget(yes,myX,nextY,sizeY,red,green,blue,X,Y,xSize,ySize,delX,delY
 		
 	end
 
-    always @(up,down)begin
+    always @(up,down,subtractY)begin
         nextSubY = up? 1:(down? 0: subtractY);
     end
 	

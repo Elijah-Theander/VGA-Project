@@ -20,8 +20,9 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 	input               enable;
 	input               clk,reset;
 	
-	reg signed    [10:0]  myX,myY,nextX,nextY;
+	reg signed   [10:0]  myX,myY,nextX,nextY;
 	reg subtractX,subtractY,nextSubX,nextSubY;
+	reg          [3:0] myRed,myGreen,myBlue,nextRed,nextGreen,nextBlue;
 	
 	parameter rightBorder = 799, bottomBorder = 599;
 	
@@ -29,12 +30,14 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 		if(reset)begin
 			myX <= firstX;
 			myY <= firstY;
+			{myRed,myGreen,myBlue} = 12'h000;
 			subtractX = 0;
 			subtractY = 0;
 		end
 		else begin
 			myX <= nextX;
 			myY <= nextY;
+			{myRed,myGreen,myBlue} = {nextRed,nextGreen,nextBlue};
 			subtractX = nextSubX;
 			subtractY = nextSubY;
 		end
@@ -133,8 +136,17 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
         end
     end
 	
-	assign {red,green,blue} = {redIn,greenIn,blueIn};
+	assign {red,green,blue} = {myRed,myGreen,myBlue};
 	
 	assign yes = (((X >= myX)&&(X <= (myX + xSize)))&&((Y >= myY) && (Y <= (myY + ySize))));
+	
+	always @(myX,delX,xSize,theirX,myY,delY,theirNextY,theirSizeY,ySize,redIn,blueIn,greenIn,myRed,myBlue,myGreen)begin
+		if((((myX+delX+xSize)>=theirX)&&(((myY+delY) <= (theirNextY +theirSizeY))&&((myY+delY+ySize)>=theirNextY))))begin
+			{nextRed,nextGreen,nextBlue} = {redIn,greenIn,blueIn};
+		end
+		else begin
+			{nextRed,nextGreen,nextBlue} = {myRed,myGreen,myBlue};
+		end
+	end
 	
 endmodule

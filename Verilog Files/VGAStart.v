@@ -3,17 +3,19 @@
 // Jerry C. Hamann
 
 module FirstVGA(VS, HS, RED, GREEN, BLUE, SWITCH,BTNU,BTND, CLK_100MHz, Reset);
-    output          VS, HS; 
-    output [3:0]    RED, GREEN, BLUE;
-    input  [4:0]    SWITCH;
-	input           BTNU,BTND;
-    input           CLK_100MHz, Reset;
+
+    output             VS, HS; 
+    output      [3:0]  RED, GREEN, BLUE;
+    input       [4:0]  SWITCH;
+	input              BTNU,BTND;
+    input              CLK_100MHz, Reset;
     
-    wire            HBlank, VBlank,ballYes,paddleYes,wEn;
-    wire   [10:0]   CurrentX, CurrentY;
-	wire   [3:0]    bRed,bGreen,bBlue,pRed,pGreen,pBlue;
+    wire               HBlank, VBlank,ballYes,paddleYes,wEn;
+    wire        [10:0] CurrentX, CurrentY;
+	wire        [3:0]  bRed,bGreen,bBlue,pRed,pGreen,pBlue;
 	wire signed [10:0] paddleX,paddleNextY;
-	wire  [8:0]     paddleSizeY;
+	wire        [8:0]  paddleSizeY;
+	wire        [3:0]  cRed,cGreen,cBlue;
 
     // Connect to driver of VGA signals
     VGALLDriver vgadll(.VS(VS),
@@ -55,9 +57,9 @@ module FirstVGA(VS, HS, RED, GREEN, BLUE, SWITCH,BTNU,BTND, CLK_100MHz, Reset);
 						.ySize(9'd20),
 						.delX(5'd6),
 						.delY(5'd4),
-						.redIn(4'd0),
-						.greenIn(4'd15),
-						.blueIn(4'd0),
+						.redIn(cRed),
+						.greenIn(cGreen),
+						.blueIn(cBlue),
 						.enable(wEn),
 						.firstX(11'd0),
 						.firstY(11'd0),
@@ -96,4 +98,12 @@ module FirstVGA(VS, HS, RED, GREEN, BLUE, SWITCH,BTNU,BTND, CLK_100MHz, Reset);
 						 .enable(1'b1),
 						 .clk(CLK_100MHz),
 						 .reset(Reset));
+						 
+	// color cycle
+	colorCycle colordriver(.red(cRed),
+	                       .green(cGreen),
+	                       .blue(cBlue),
+	                       .enable(wEn),
+	                       .clk(CLK_100MHz),
+	                       .reset(Reset));
 endmodule
