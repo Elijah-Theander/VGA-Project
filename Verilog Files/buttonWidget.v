@@ -1,29 +1,32 @@
 /*
 Authored by Elijah Theander
-December 3, 2016
-Widget.v
-State machine module designed to run a sprite
-on a VGA screen at 800x600.
+December 5, 2016
+buttonWidget.v
+widget.v, but with added logic for 
+user input for controlling y location.
 */
 
-module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,enable,firstX,firstY,theirNextY,theirSizeY,theirX,clk,reset);
+module buttonWidget(yes,myX,nextY,sizeY,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,enable,up,down,firstX,firstY,clk,reset);
 
 	output              yes;
+	output signed[10:0] myX,nextY;
+	output       [8:0]  sizeY;
 	output       [3:0]  red,green,blue;
 	
 	input        [10:0] X,Y,firstX,firstY;
-	input signed [10:0] theirX, theirNextY;
-	input        [8:0]  theirSizeY;
 	input        [8:0]  xSize,ySize;
 	input signed [4:0]  delX,delY;
 	input        [3:0]  redIn,greenIn,blueIn;
 	input               enable;
+	input               up,down;
 	input               clk,reset;
 	
 	reg signed    [10:0]  myX,myY,nextX,nextY;
 	reg subtractX,subtractY,nextSubX,nextSubY;
 	
 	parameter rightBorder = 799, bottomBorder = 599;
+	
+	assign sizeY = ySize;
 	
 	always @(posedge clk)begin
 		if(reset)begin
@@ -41,7 +44,7 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 	end
 	
 	//nextX and nextY
-	always @(myX,delX,xSize,subtractX,enable,theirX,myY,delY,theirNextY,theirSizeY,ySize)begin
+	always @(myX,delX,xSize,subtractX,enable)begin
 	   if(enable)begin
 	   
 	       if(subtractX)begin
@@ -55,10 +58,7 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
                
 	       end
 	       else begin
-			   if(((myX+delX+xSize)>=theirX)&&(((myY+delY) <= (theirNextY +theirSizeY))&&((myY+delY+ySize)>=theirNextY)))begin
-					nextX = (theirX-xSize);
-			   end
-	           else if(((myX + delX +xSize)>=rightBorder)&&((myX + delX + xSize)<=1023))begin
+	           if(((myX + delX +xSize)>=rightBorder)&&((myX + delX + xSize)<=1023))begin
 	               nextX = (rightBorder - xSize);
 	           end 
 	           else begin
@@ -72,22 +72,22 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 	   
 	end
 	
-	always @(myY,delY,ySize,subtractY,enable)begin
+	always @(myY,delY,ySize,subtractY,enable,up,down)begin
 	   if(enable)begin
 	       if(subtractY)begin
 	           if((myY - delY)<=0)begin
-	               nextY = 0;
+	               nextY = up ? 0:myY;
 	           end
 	           else begin
-	               nextY = (myY - delY);
+	               nextY = up ?(myY - delY):myY;
 	           end
 	       end
 	       else begin
 	           if(((myY + delY + ySize)>=bottomBorder)&&((myY + delY + ySize)<=1023))begin
-	               nextY = (bottomBorder - ySize);
+	               nextY = down? (bottomBorder - ySize):myY;
 	           end
 	           else begin
-	               nextY = (myY + delY);
+	               nextY = down? (myY + delY):myY;
 	           end
 	       end
 	   end
@@ -97,10 +97,10 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 	end
 	
 	//subtractX & subtractY
-	always @(myX,xSize,delX,subtractX,enable,theirX,myY,delY,theirNextY,theirSizeY,ySize)begin
+	always @(myX,xSize,delX,subtractX,enable)begin
 	
 		if(enable)begin
-			if(((!subtractX)&&((myX + xSize + delX) >= rightBorder))||((((myX+delX+xSize)>=theirX)&&(((myY+delY) <= (theirNextY +theirSizeY))&&((myY+delY+ySize)>=theirNextY)))))begin
+			if((!subtractX)&&((myX + xSize + delX) >= rightBorder))begin
 				nextSubX = 1;
 			end
 			else if(subtractX &&((myX - delX)<=0))begin
@@ -116,21 +116,8 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 		
 	end
 
-    always @(myY,ySize,delY,subtractY,enable)begin
-        if(enable)begin
-            if((!subtractY)&&((myY + ySize + delY)>= bottomBorder))begin
-                nextSubY=1;
-            end
-            else if(subtractY && ((myY - delY)<=0))begin
-                nextSubY = 0;
-            end
-            else begin
-                nextSubY = subtractY;
-            end
-        end
-        else begin
-            nextSubY = subtractY;
-        end
+    always @(up,down)begin
+        nextSubY = up? 1:(down? 0: subtractY);
     end
 	
 	assign {red,green,blue} = {redIn,greenIn,blueIn};
