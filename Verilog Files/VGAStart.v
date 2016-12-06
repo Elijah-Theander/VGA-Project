@@ -2,7 +2,7 @@
 // UW EE 4490 Fall 2016
 // Jerry C. Hamann
 
-module FirstVGA(VS, HS, RED, GREEN, BLUE, SWITCH, CLK_100MHz, Reset);
+module FirstVGA(VS, HS, RED, GREEN, BLUE, SWITCH,BTNU,BTND, CLK_100MHz, Reset);
     output          VS, HS; 
     output [3:0]    RED, GREEN, BLUE;
     input  [4:0]    SWITCH;
@@ -12,6 +12,8 @@ module FirstVGA(VS, HS, RED, GREEN, BLUE, SWITCH, CLK_100MHz, Reset);
     wire            HBlank, VBlank,ballYes,paddleYes,wEn;
     wire   [10:0]   CurrentX, CurrentY;
 	wire   [3:0]    bRed,bGreen,bBlue,pRed,pGreen,pBlue;
+	wire signed [10:0] paddleX,paddleNextY;
+	wire  [8:0]     paddleSizeY;
 
     // Connect to driver of VGA signals
     VGALLDriver vgadll(.VS(VS),
