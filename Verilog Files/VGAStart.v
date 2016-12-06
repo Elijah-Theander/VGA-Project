@@ -23,7 +23,7 @@ module FirstVGA(VS, HS, RED, GREEN, BLUE, SWITCH, CLK_100MHz, Reset);
                       .SWITCH(SWITCH),.wRed(widgred),.wGreen(widggreen),.wBlue(widgblue),.yes(yeswire),.CLK_100MHz(CLK_100MHz));
 					  
 	// Create an instance of widget
-	widget		vgawidg(.yes(yeswire),
+	widget		ball(.yes(yeswire),
 						.red(widgred),
 						.green(widggreen),
 						.blue(widgblue),
