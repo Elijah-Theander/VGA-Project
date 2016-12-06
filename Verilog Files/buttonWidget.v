@@ -6,9 +6,11 @@ widget.v, but with added logic for
 user input for controlling y location.
 */
 
-module buttonWidget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,enable,up,down,firstX,firstY,clk,reset);
+module buttonWidget(yes,myX,nextY,sizeY,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,enable,up,down,firstX,firstY,clk,reset);
 
 	output              yes;
+	output signed[10:0] myX,nextY;
+	output       [8:0]  sizeY;
 	output       [3:0]  red,green,blue;
 	
 	input        [10:0] X,Y,firstX,firstY;
@@ -23,6 +25,8 @@ module buttonWidget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,b
 	reg subtractX,subtractY,nextSubX,nextSubY;
 	
 	parameter rightBorder = 799, bottomBorder = 599;
+	
+	assign sizeY = ySize;
 	
 	always @(posedge clk)begin
 		if(reset)begin

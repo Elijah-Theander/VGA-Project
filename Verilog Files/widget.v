@@ -6,12 +6,14 @@ State machine module designed to run a sprite
 on a VGA screen at 800x600.
 */
 
-module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,enable,firstX,firstY,clk,reset);
+module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,enable,firstX,firstY,theirNextY,theirSizeY,theirX,clk,reset);
 
 	output              yes;
 	output       [3:0]  red,green,blue;
 	
 	input        [10:0] X,Y,firstX,firstY;
+	input signed [10:0] theirX, theirNextY;
+	input        [8:0]  theirSizeY;
 	input        [8:0]  xSize,ySize;
 	input signed [4:0]  delX,delY;
 	input        [3:0]  redIn,greenIn,blueIn;
@@ -39,7 +41,7 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 	end
 	
 	//nextX and nextY
-	always @(myX,delX,xSize,subtractX,enable)begin
+	always @(myX,delX,xSize,subtractX,enable,theirX,myY,delY,theirNextY,theirSizeY,ySize)begin
 	   if(enable)begin
 	   
 	       if(subtractX)begin
@@ -53,7 +55,10 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
                
 	       end
 	       else begin
-	           if(((myX + delX +xSize)>=rightBorder)&&((myX + delX + xSize)<=1023))begin
+			   if(((myX+delX+xSize)>=theirX)&&(((myY+delY) <= (theirNextY +theirSizeY))&&((myY+delY+ySize)>=theirNextY)))begin
+					nextX = (theirX-xSize);
+			   end
+	           else if(((myX + delX +xSize)>=rightBorder)&&((myX + delX + xSize)<=1023))begin
 	               nextX = (rightBorder - xSize);
 	           end 
 	           else begin
@@ -95,7 +100,7 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 	always @(myX,xSize,delX,subtractX,enable)begin
 	
 		if(enable)begin
-			if((!subtractX)&&((myX + xSize + delX) >= rightBorder))begin
+			if(((!subtractX)&&((myX + xSize + delX) >= rightBorder))||((((myX+delX+xSize)>=theirX)&&(((myY+delY) <= (theirNextY +theirSizeY))&&((myY+delY+ySize)>=theirNextY)))))begin
 				nextSubX = 1;
 			end
 			else if(subtractX &&((myX - delX)<=0))begin
