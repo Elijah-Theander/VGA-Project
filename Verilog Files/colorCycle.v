@@ -8,11 +8,13 @@ into red, green, and blue inputs for widget.
 
 module colorCycle(red,green,blue,enable,clk,reset);
 
-	output [3:0] red,green,blue;
-	input enable,clk,reset;
+	output [3:0]  red,green,blue; 
+	input         enable;
+	input 		  clk,reset;
 	
-	reg [11:0] S,nS;
+	reg    [11:0] S,nS;
 	
+	//State memory
 	always @(posedge clk)begin
 		if(reset)begin
 			S <= 0;
@@ -25,6 +27,7 @@ module colorCycle(red,green,blue,enable,clk,reset);
 		end
 	end
 	
+	//Next state
 	always @(S)begin
 		if((S + 1) == 12'h771)begin
 			nS = 12'h870;

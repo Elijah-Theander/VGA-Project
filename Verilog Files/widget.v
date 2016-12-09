@@ -8,24 +8,26 @@ on a VGA screen at 800x600.
 
 module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,enable,firstX,firstY,theirNextY,theirSizeY,theirX,clk,reset);
 
-	output              yes;
-	output       [3:0]  red,green,blue;
+	output              yes; //Signal for Drawing of object
+	output       [3:0]  red,green,blue; //Color of object being fed to Client
 	
-	input        [10:0] X,Y,firstX,firstY;
-	input signed [10:0] theirX, theirNextY;
-	input        [8:0]  theirSizeY;
-	input        [8:0]  xSize,ySize;
-	input signed [4:0]  delX,delY;
-	input        [3:0]  redIn,greenIn,blueIn;
-	input               enable;
-	input               clk,reset;
+	input        [10:0] X,Y,firstX,firstY; //Location of driver scan and starting location of widget
+	input signed [10:0] theirX, theirNextY; // Status signal for collision with other widget.
+	input        [8:0]  theirSizeY; //Size for collision calculation with other widget
+	input        [8:0]  xSize,ySize; // Determines width and Height of widget
+	input signed [4:0]  delX,delY; // "Velocity" of object, also depends on refresh rate given by enable
+	input        [3:0]  redIn,greenIn,blueIn; // Color the widget is picking up
+	input               enable; // Enable signal from clockDiv
+	input               clk,reset; //Synchronous clock and reset
 	
-	reg signed   [10:0]  myX,myY,nextX,nextY;
-	reg subtractX,subtractY,nextSubX,nextSubY;
-	reg          [3:0] myRed,myGreen,myBlue,nextRed,nextGreen,nextBlue;
+	//State variables
+	reg signed   [10:0] myX,myY,nextX,nextY;
+	reg                 subtractX,subtractY,nextSubX,nextSubY;
+	reg          [3:0]  myRed,myGreen,myBlue,nextRed,nextGreen,nextBlue;
 	
 	parameter rightBorder = 799, bottomBorder = 599;
 	
+	//State Memory
 	always @(posedge clk)begin
 		if(reset)begin
 			myX <= firstX;
@@ -43,7 +45,7 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 		end
 	end
 	
-	//nextX and nextY
+	//nextX
 	always @(myX,delX,xSize,subtractX,enable,theirX,myY,delY,theirNextY,theirSizeY,ySize)begin
 	   if(enable)begin
 	   
@@ -75,6 +77,7 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 	   
 	end
 	
+	//nextY
 	always @(myY,delY,ySize,subtractY,enable)begin
 	   if(enable)begin
 	       if(subtractY)begin
@@ -99,7 +102,7 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 	   end
 	end
 	
-	//subtractX & subtractY
+	//nextSubX
 	always @(myX,xSize,delX,subtractX,enable,theirX,myY,delY,theirNextY,theirSizeY,ySize)begin
 	
 		if(enable)begin
@@ -119,6 +122,7 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
 		
 	end
 
+	//nextSubY
     always @(myY,ySize,delY,subtractY,enable)begin
         if(enable)begin
             if((!subtractY)&&((myY + ySize + delY)>= bottomBorder))begin
@@ -136,10 +140,13 @@ module widget(yes,red,green,blue,X,Y,xSize,ySize,delX,delY,redIn,greenIn,blueIn,
         end
     end
 	
+	
 	assign {red,green,blue} = {myRed,myGreen,myBlue};
 	
+	//yes assignment for drawing of object
 	assign yes = (((X >= myX)&&(X <= (myX + xSize)))&&((Y >= myY) && (Y <= (myY + ySize))));
 	
+	//next Red,Green,Blue
 	always @(myX,delX,xSize,theirX,myY,delY,theirNextY,theirSizeY,ySize,redIn,blueIn,greenIn,myRed,myBlue,myGreen)begin
 		if((((myX+delX+xSize)>=theirX)&&(((myY+delY) <= (theirNextY +theirSizeY))&&((myY+delY+ySize)>=theirNextY))))begin
 			{nextRed,nextGreen,nextBlue} = {redIn,greenIn,blueIn};

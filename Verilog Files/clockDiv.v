@@ -7,7 +7,7 @@ right now the divPulse signal is running at 30 Hz.
 */
 
 module clockDiv(divPulse,enable,clk,reset);
-	output divPulse;       
+	output divPulse;    //Divided output 
 	input  enable;      //Enable the counter. For our purposes it will be high always.
 	input  clk,reset;   
 	
